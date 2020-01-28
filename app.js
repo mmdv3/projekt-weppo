@@ -21,7 +21,7 @@ var pool = new pg.Pool({
 });
 /// get/post //////////////////////////////////////////////////////////////////
   // start page
-  app.get( '/', async (req, res) => {
+app.get( '/', async (req, res) => {
 
 	var item_pool = [];
 	var item_name = [];
@@ -34,14 +34,22 @@ var pool = new pg.Pool({
 	  item_pool.push([`${r.item}`,`${r.description}`]);
 	});
 
-  await pool.release;
+  	await pool.release;
 
 	console.log(item_name);
 
-  res.render('index', {nick:guest_nick, login:'no', login_text:log_in,
+  	res.render('index', {nick:guest_nick, login:'no', login_text:log_in,
   	//item_name:item_name, item_desc:item_desc}); 
 
 	item_pool:item_pool});
+});
+
+app.get('/register', (req, res) => {
+	
+});
+
+app.get('/login', (req, res) => {
+
 });
 
 /// server ////////////////////////////////////////////////////////////////////
