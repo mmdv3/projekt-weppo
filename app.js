@@ -1,17 +1,16 @@
-/// modules ///////////////////////////////////////////////////////////////////
 var http = require('http');
 var express = require('express');
-///////////////////////////////////////////////////////////////////////////////
+var cookieParser = require('cookie-parser');
+
 var app = express();
-var pg = require('pg'); //postgreSQL
+var pg = require('pg');
 
 app.set('view engine', 'ejs');
 app.set('views', './views');
 
+app.use(cookieParser('sdasdsadsaf'));
 app.use(express.urlencoded({extened:true}));
-///////////////////////////////////////////////////////////////////////////////
-const log_in = 'zaloguj się';
-const log_out = 'wyloguj się';
+
 const guest_nick = 'gość';
 
 var pool = new pg.Pool({
@@ -19,29 +18,17 @@ var pool = new pg.Pool({
   database: 'sklep_weppo',
   user:'admin'
 });
-/// get/post //////////////////////////////////////////////////////////////////
-  // start page
-app.get( '/', async (req, res) => {
 
-	var item_pool = [];
-	var item_name = [];
-	var item_desc = [];
-
+// start page
+app.get('/', async (req, res) => {
 	await pool.connect();
 	var result = await pool.query(`select * from items`);
+	await pool.release;
 
-	result.rows.forEach( r => {
-	  item_pool.push([`${r.item}`,`${r.description}`]);
+  	res.render('index', {
+		nick: guest_nick, login: 'no', login_text:log_in,
+		items: result.rows
 	});
-
-  	await pool.release;
-
-	console.log(item_name);
-
-  	res.render('index', {nick:guest_nick, login:'no', login_text:log_in,
-  	//item_name:item_name, item_desc:item_desc}); 
-
-	item_pool:item_pool});
 });
 
 app.get('/register', (req, res) => {
@@ -52,7 +39,6 @@ app.get('/login', (req, res) => {
 
 });
 
-/// server ////////////////////////////////////////////////////////////////////
 http.createServer(app).listen(3000);
 
 

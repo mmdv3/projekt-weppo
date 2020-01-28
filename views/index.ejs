@@ -78,25 +78,26 @@ input#hidden {
 <body>
 
   <header>
-	<h2>projekt - weppo</h2>
+	<h2>Sklep internetowy</h2>
   </header>
 
 <section>
   <nav>
-  nazwa użytkownika:<%=nick%>
-  <a href="authentication"><%=login_text%></a>
-  <a href="koszyk">Koszyk</a>
+    Nazwa użytkownika: <%=nick%>
+    <a href="login">Zaloguj się</a>
+    <a href="register">Zarejestruj się</a>
+    <a href="koszyk">Koszyk</a>
   </nav>
 </section>
 
 <section>
   <article>
 	<table width = "100%" border = "1">
-  <% item_pool.forEach((v) => { %>
+  <% items.forEach((v) => { %>
 	  <tr>
-		<td>
-  <%=v[0]%> <br> <%=v[1]%>
-		</td>
+		  <td>
+        <%=v.item%> <br> <%=v.description%>
+		  </td>
 		<td>
 		  <form method="POST">
 			<div id='add_to_cart'>
@@ -115,7 +116,7 @@ input#hidden {
 </section>
 
 <footer>
-  <p>elo</p>
+  <p>Produkty</p>
 </footer>
 
 </body>
