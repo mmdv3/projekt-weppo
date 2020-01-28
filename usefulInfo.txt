@@ -1,6 +1,3 @@
-### useful info ###############################################################
-weppo_projekt - database name
-### database setup ############################################################
 CREATE TABLE users (
 	id SERIAL,
 	nick VARCHAR(20),

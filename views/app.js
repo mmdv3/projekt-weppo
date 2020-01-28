@@ -16,8 +16,8 @@ const guest_nick = 'gość';
 
 var pool = new pg.Pool({
   host: 'localhost',
-  database: 'sklep_weppo',
-  user:'admin'
+  database: 'weppo_projekt',
+  user:'archie'
 });
 /// get/post //////////////////////////////////////////////////////////////////
   // start page
