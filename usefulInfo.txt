@@ -1,0 +1,39 @@
+### useful info ###############################################################
+weppo_projekt - database name
+### database setup ############################################################
+CREATE TABLE users (
+	id SERIAL,
+	nick VARCHAR(20),
+	password VARCHAR(20),
+	privileged BOOLEAN,
+	PRIMARY KEY (id)	
+);
+
+INSERT INTO users
+	(nick, password, privileged)
+VALUES
+	('admin', 'admin', TRUE) ;
+
+CREATE TABLE items (
+	id SERIAL,
+	item VARCHAR(40),
+	description VARCHAR(120),
+	PRIMARY KEY (id)
+);
+
+INSERT INTO items
+	(item, description)
+	VALUES
+	('karma dla psa(biała)', 'zwykłej jakości karma dla psa'),
+	('karma dla kota(biała)', 'zwykłej jakości karma dla kota'),
+	('karma dla konia(biała)', 'zwykłej jakości karma dla konia'),
+	('karma dla papugi(biała)', 'zwykłej jakości karma dla papugi'),
+	('karma dla psa(żółta)', 'lepszej jakości karma dla psa'),
+	('karma dla kota(żółta)', 'lepszej jakości karma dla kota'),
+	('karma dla konia(żółta)', 'lepszej jakości karma dla konia'),
+	('karma dla papugi(żółta)', 'lepszej jakości karma dla papugi'),
+	('karma dla psa(niebieska)', 'najlepszej jakości karma dla psa'),
+	('karma dla kota(niebieska)', 'najlepszej jakości karma dla kota'),
+	('karma dla konia(niebieska)', 'najlepszej jakości karma dla konia'),
+	('karma dla papugi(niebieska)', 'najlepszej jakości karma dla papugi')
+;
