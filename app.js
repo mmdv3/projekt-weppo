@@ -1,44 +1,30 @@
-var http = require('http');
-var express = require('express');
-var cookieParser = require('cookie-parser');
+const http = require('http');
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const pg = require('pg');
+const Repository = require('./repo.js');
 
-var app = express();
-var pg = require('pg');
-
+const app = express();
 app.set('view engine', 'ejs');
 app.set('views', './views');
 
-app.use(cookieParser('sdasdsadsaf'));
-app.use(express.urlencoded({extened:true}));
+app.use(cookieParser('23dsadsaifdsfddvcas8'));
+app.use(express.urlencoded({ extended: true }));
 
-const guest_nick = 'gość';
-
-var pool = new pg.Pool({
-  host: 'localhost',
-  database: 'sklep_weppo',
-  user:'admin'
+const pool = new pg.Pool({
+    host: 'localhost',
+    database: 'sklep_weppo',
+    user: 'admin'
 });
 
-// start page
+const repo = new Repository(pool);
+
 app.get('/', async (req, res) => {
-	await pool.connect();
-	var result = await pool.query(`select * from items`);
-	await pool.release;
-
-  	res.render('index', {
-		nick: guest_nick, login: 'no', login_text:log_in,
-		items: result.rows
-	});
-});
-
-app.get('/register', (req, res) => {
-	
-});
-
-app.get('/login', (req, res) => {
-
+    var items = await repo.getItems();
+    res.render('index', {
+        nick: 'gość',
+        items: items
+    });
 });
 
 http.createServer(app).listen(3000);
-
-
