@@ -34,7 +34,8 @@ app.get('/', async (req, res) => {
     res.render('index', {
         nick: req.signedCookies.username,
         items: items,
-        msg: ''
+        msg: '',
+        logged: req.signedCookies.logged
     });
 });
 
@@ -51,7 +52,7 @@ app.post('/register', async (req, res) => {
         msg = 'Zbyt krótkie hasło!;'
     }
     else {
-        msg = await repo.addUser(user, pass, msg);
+        msg = await repo.addUser(user, pass);
     }
 
     var items = await repo.getItems();
@@ -59,7 +60,8 @@ app.post('/register', async (req, res) => {
     res.render('index', {
         nick: req.signedCookies.username,
         items: items,
-        msg: msg
+        msg: msg,
+        logged: req.signedCookies.logged
     });
 });
 
@@ -70,7 +72,7 @@ app.post('/login', async (req, res) => {
     var info = await repo.logIn(user, pass);
 
     if (info.success) {
-        res.cookie('logged', info.success, { signed: true });
+        res.cookie('logged', true, { signed: true });
         res.cookie('username', user, { signed: true });
     }
 
@@ -79,18 +81,22 @@ app.post('/login', async (req, res) => {
     res.render('index', {
         nick: info.success ? user : req.signedCookies.username, 
         items: items,
-        msg: info.msg
+        msg: info.msg,
+        logged: info.success
     });
 });
 
 app.post('/logout', async (req, res) => {
     res.cookie('logged', false, { signed: true, maxAge: -1 });
     res.cookie('username', 'gość', { signed: true });
+
     var items = await repo.getItems();
+
     res.render('index', {
         nick: 'gość',
         items: items,
-        msg: 'Wylogowano pomyślnie!'
+        msg: 'Wylogowano pomyślnie!',
+        logged: false
     });
 });
 

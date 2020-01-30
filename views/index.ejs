@@ -83,18 +83,20 @@ input#hidden {
 
 <section>
   <nav>
-    Nazwa użytkownika: <%=nick%>
-    <form method="POST" action="login">
-      Login: <input type="text" name="username">
-      Hasło: <input type="password" name="password">
-      <button>Zaloguj się</button>
-    </form>
-    <form method="POST" action="register">
-      Login: <input type="text" name="username">
-      Hasło: <input type="password" name="password">
-      <button>Zarejestruj się</button>
-    </form>
-    <%= msg %>
+    <div> Nazwa użytkownika: <%= nick %> </div>
+    <% if (!logged) { %>
+      <form method="POST" action="login">
+        Login: <input type="text" name="username">
+        Hasło: <input type="password" name="password">
+        <button>Zaloguj się</button>
+      </form>
+      <form method="POST" action="register">
+        Login: <input type="text" name="username">
+        Hasło: <input type="password" name="password">
+        <button>Zarejestruj się</button>
+      </form>
+    <% } %>
+    <div> <%= msg %> </div>
     <a href="koszyk">Koszyk</a>
     <form method="POST" action="logout">
       <button> Wyloguj się</button> 
