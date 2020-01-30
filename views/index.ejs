@@ -97,7 +97,9 @@ input#hidden {
       </form>
     <% } %>
     <div> <%= msg %> </div>
-    <a href="koszyk">Koszyk</a>
+    <% if (logged) { %>
+      <a href="cart">Koszyk</a>
+    <% } %>
     <form method="POST" action="logout">
       <button> Wyloguj się</button> 
     </form>
@@ -113,14 +115,18 @@ input#hidden {
         <%=v.item%> <br> <%=v.description%>
 		  </td>
 		<td>
-		  <form method="POST">
+		  <form method="POST" action="add_to_cart">
 			<div id='add_to_cart'>
 			  <input id='hidden' type='text' name='type'
 					 value='add_to_cart'>
 			  <input id='hidden' type='number' name='product_id'
 			  value='l'>
 			  <input type='number' name='amount'>
-			  <button>dodaj do koszyka</button>
+        <% if (logged) { %>
+          <button>dodaj do koszyka</button>
+        <% } else { %>
+          <button disabled> dodaj do koszyka</button>
+        <% } %>
 			</div>
 		  </form>
 		</td>

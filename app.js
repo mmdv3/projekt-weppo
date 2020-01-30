@@ -100,5 +100,13 @@ app.post('/logout', async (req, res) => {
     });
 });
 
+app.post('/add_to_cart', async (req, res) => {
+    res.end('adding to cart');
+});
+
+app.get('/cart', async (req, res) => {
+    res.end('cart');
+});
+
 
 http.createServer(app).listen(3000);
