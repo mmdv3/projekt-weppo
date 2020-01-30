@@ -34,3 +34,6 @@ INSERT INTO items
 	('karma dla konia(niebieska)', 'najlepszej jakości karma dla konia'),
 	('karma dla papugi(niebieska)', 'najlepszej jakości karma dla papugi')
 ;
+
+ALTER TABLE users
+ADD CONSTRAINT unique_nick UNIQUE (nick);
