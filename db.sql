@@ -57,4 +57,4 @@ CREATE TABLE ordered_items (
 
 ALTER TABLE items
 	ADD available BOOL
-	DEFAULT (FALSE);
+	CONSTRAINT default_constraint DEFAULT TRUE;
