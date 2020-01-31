@@ -171,7 +171,66 @@ class Repository {
 		  	console.log(err);
 		  	return [];
 		}
-	}
+    }
+    
+    async addItem(name, desc) {
+        try {
+            var client = await this.pool.connect();
+            await client.query(`
+                insert into items
+                    (item, description)
+                    values
+                    (\'${name}\', \'${desc}\');
+            `);
+            return {
+                msg: 'Towar dodano pomyślnie!'
+            };
+        }
+        catch (err) {
+            console.log(err);
+            return {
+                msg: 'Niepowodzenie'
+            };
+        }
+    }
+
+    async modifyItem(id, newName, newDesc) {
+        try {
+            var client = await this.pool.connect();
+            await client.query(`
+                update items 
+                set item=\'${newName}\', description=\'${newDesc}\'
+                where id=${id};
+            `);
+            return {
+                msg: 'Towar został zmodyfikowany!'
+            };
+        }
+        catch (err) {
+            console.log(err);
+            return {
+                msg: 'Niepowodzenie!'
+            };
+        }
+    }
+
+    async removeItem(id) {
+        try {
+            var client = await this.pool.connect();
+            await client.query(`
+                delete from items where id=\'${id}\';
+            `);
+            return {
+                msg: 'Towar został usunięty!'
+            };
+        }
+        catch (err) {
+            console.log(err);
+            return {
+                msg: 'Niepowodzenie!'
+            };
+        }
+    }
 
   	async getId(user_name) {
 	  	try {

@@ -217,7 +217,62 @@ app.post('/make_order', isLogged, async (req, res) => {
 });
 
 app.get('/finished_order', isLogged, async (req, res) => {
-  	res.render('finished_order');
+      res.render('finished_order');
+});
+
+app.get('/products', isPrivileged, (req, res) => {
+    res.render('products');
+});
+
+app.get('/edit_products', isPrivileged, async (req, res) => {
+    var items = await repo.getItems();
+    res.render('edit', {
+        items: items,
+        msg: ''
+    });
+});
+
+app.post('/modify', isPrivileged, async (req, res) => {
+    var newName = req.body.name;
+    var newDesc = req.body.description;
+    var id = req.body.id;
+
+    var info = await repo.modifyItem(id, newName, newDesc);
+    var items = await repo.getItems();
+
+    res.render('edit', {
+        items: items,
+        msg: info.msg
+    });
+});
+
+app.post('/remove', isPrivileged, async (req, res) => {
+    var id = req.body.id;
+
+    var info = await repo.removeItem(id);
+    var items = await repo.getItems();
+
+    res.render('edit', {
+        items: items,
+        msg: info.msg
+    })
+});
+
+app.get('/add_products', isPrivileged, (req, res) => {
+    res.render('add', {
+        msg: ''
+    });
+});
+
+app.post('/add', isPrivileged, async (req, res) => {
+    var name = req.body.name;
+    var desc = req.body.description;
+    
+    var info = await repo.addItem(name, desc);
+
+    res.render('add', {
+        msg: info.msg
+    });
 });
 
 http.createServer(app).listen(3000);

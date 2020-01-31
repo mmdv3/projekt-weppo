@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Strona logowania</title>
+    </head>
+    <body>
+        <% items.forEach((item) => { %>
+            <div>
+                <form method="POST">
+                    Nazwa: <input type="text" name="name" value="<%= item.item %>">
+                    Opis: <input type="text" name="description" value="<%= item.description %>">
+                    <input hidden="true" type="number" name="id" value="<%= item.id %>">
+                    <button formaction="/modify">Zmień</button>
+                    <button formaction="/remove">Usuń</button>
+                </form>
+            </div>
+        <% }) %>
+        <%= msg %>
+        <a href='/'>Strona główna</a>
+    </body>
+</html>
