@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Koszyk</title>
+    </head>
+    <body>
+      <div>Produkty w koszyku:</div>
+      <% cart.forEach((p) => { %>
+        <div>
+          Nazwa: <%= p.name %>, opis: <%= p.description %>, ilość: <%= p.quantity %>
+          <form method="POST" action="remove_from_cart">
+            <input hidden='true' type='number' name='productID' value='<%= p.id %>'>
+            <button>Usuń</button>
+          </form>
+        </div>
+      <% }); %>
+      <a href='/'>Strona główna</a>
+    </body>
+</html>

@@ -1,6 +1,6 @@
 const http = require('http');
 const express = require('express');
-const cookieParser = require('cookie-parser');
+const session = require('express-session');
 const pg = require('pg');
 const Repository = require('./repo.js');
 
@@ -8,34 +8,60 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', './views');
 
-app.use(cookieParser('23dsadsaifdsfddvcas8'));
-app.use(express.urlencoded({ extended: true }));
+app.use(session({
+    secret: 'sdadsaxzzxcv',
+    resave: true,
+    saveUninitialized: true
+}));
+
+app.use(express.urlencoded({
+    extended: true
+}));
 
 app.use((req, res, next) => {
-    if (!req.signedCookies.username) {
-        res.cookie('username', 'gość', { signed: true });
-        res.redirect(req.url);
+    if (!req.session.username) {
+        req.session.username = 'gość';
     }
-    else {
+    next();
+});
+
+function authorize(req, res, next) {
+    if (req.session.logged) {
         next();
     }
-});
+    else {
+        res.redirect('/login');
+    }
+}
 
-const pool = new pg.Pool({
-    host: 'localhost',
+class Product {
+    constructor (id, quantity) {
+        this.id = id;
+        this.quantity = quantity;
+    }
+}
+
+const repo = new Repository(new pg.Pool({
+    host: 'localhost', 
     database: 'sklep_weppo',
     user: 'admin'
-});
-
-const repo = new Repository(pool);
+}));
 
 app.get('/', async (req, res) => {
     var items = await repo.getItems();
+    var prodAmount = req.session.logged ? req.session.cart.length : 0;
+
     res.render('index', {
-        nick: req.signedCookies.username,
-        items: items,
-        msg: '',
-        logged: req.signedCookies.logged
+        username: req.session.username,
+        items: items, 
+        logged: req.session.logged,
+        prodAmount: prodAmount
+    });
+});
+
+app.get('/login', (req, res) => {
+    res.render('login', {
+        msg: ''
     });
 });
 
@@ -43,70 +69,97 @@ app.post('/register', async (req, res) => {
     var user = req.body.username;
     var pass = req.body.password;
 
-    var msg = '';
-    
     if (user.length <= 4) {
-        msg = 'Zbyt krótki login!';
+        var msg = 'Zbyt krótki login!'
     }
     else if (pass.length <= 5) {
-        msg = 'Zbyt krótkie hasło!;'
+        var msg = 'Zbyt krótkie hasło!'
     }
     else {
-        msg = await repo.addUser(user, pass);
+        var msg = await repo.addUser(user, pass);
     }
-
-    var items = await repo.getItems();
-
-    res.render('index', {
-        nick: req.signedCookies.username,
-        items: items,
+    
+    res.render('login', {
         msg: msg,
-        logged: req.signedCookies.logged
     });
 });
 
 app.post('/login', async (req, res) => {
     var user = req.body.username;
     var pass = req.body.password;
-
     var info = await repo.logIn(user, pass);
 
     if (info.success) {
-        res.cookie('logged', true, { signed: true });
-        res.cookie('username', user, { signed: true });
+        req.session.logged = true;
+        req.session.username = user;
+        req.session.cart = [];
+
+        var items = await repo.getItems();
+        
+        res.render('index', {
+            username: req.session.username, 
+            items: items, 
+            logged: req.session.logged, 
+            prodAmount: req.session.cart.length
+        });
+    }
+    else {
+        res.render('login', {
+            msg: info.msg
+        });
+    }
+});
+
+app.post('/logout', authorize, async (req, res) => {
+    req.session.username = 'gość';
+    delete req.session.logged;
+    delete req.session.cart;
+
+    var items = await repo.getItems();
+
+    res.render('index', {
+        username: req.session.username, 
+        items: items, 
+        logged: req.session.logged
+    });
+});
+
+app.post('/add_to_cart', authorize, async (req, res) => {
+    var productID = req.body.productID;
+    var quantity = Number(req.body.quantity);
+    if (quantity < 0)
+        quantity = 0;
+
+    var prod = req.session.cart.find(p => p.id == productID);
+    if (prod) {
+        prod.quantity = Number(prod.quantity) + quantity;
+    }
+    else if (quantity > 0) {
+        req.session.cart.push(
+            new Product(productID, quantity)
+        );
     }
 
     var items = await repo.getItems();
 
     res.render('index', {
-        nick: info.success ? user : req.signedCookies.username, 
-        items: items,
-        msg: info.msg,
-        logged: info.success
+        username: req.session.username, 
+        items: items, 
+        logged: req.session.logged,
+        prodAmount: req.session.cart.length
     });
 });
 
-app.post('/logout', async (req, res) => {
-    res.cookie('logged', false, { signed: true, maxAge: -1 });
-    res.cookie('username', 'gość', { signed: true });
+app.post('/remove_from_cart', authorize, async (req, res) => {
+    req.session.cart = req.session.cart.filter(p => p.id != req.body.productID);
+    res.redirect('/cart');
+});
 
-    var items = await repo.getItems();
-
-    res.render('index', {
-        nick: 'gość',
-        items: items,
-        msg: 'Wylogowano pomyślnie!',
-        logged: false
+app.get('/cart', authorize, async (req, res) => {  
+    var cart = await repo.getProducts(req.session.cart); 
+    res.render('cart', {
+        cart: cart
     });
 });
-
-app.post('/add_to_cart', async (req, res) => {
-    res.end('adding to cart');
-});
-
-app.get('/cart', async (req, res) => {
-    res.end('cart');
-});
-
 
 http.createServer(app).listen(3000);

@@ -35,6 +35,39 @@ class Repository {
         }
     }
 
+    async getProducts(cart) {
+        try {
+            var client = await this.pool.connect();
+            
+            cart = await Promise.all(
+                cart.map(async (p) => {
+                    var res = await client.query(`
+                        select * from items where id=${p.id};
+                    `);
+                    var prod = res.rows[0];
+                    if (prod) {
+                        return {
+                            id: prod.id,
+                            name: prod.item, 
+                            description: prod.description,
+                            quantity: p.quantity
+                        }
+                    }
+                    return undefined;
+                })
+            );
+
+            await client.release();
+
+            return cart.filter(p => p);
+        }
+        catch (err) {
+            console.log(err);
+            return [];
+        }
+            
+    }
+
     async logIn(user, pass) {
         try {
             var client = await this.pool.connect();
