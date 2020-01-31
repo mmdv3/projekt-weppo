@@ -55,6 +55,8 @@ app.get('/', async (req, res) => {
         username: req.session.username,
         items: items, 
         logged: req.session.logged,
+	  	privileged: req.session.privileged,
+//	    privileged: true,
         prodAmount: prodAmount
     });
 });
@@ -88,18 +90,23 @@ app.post('/login', async (req, res) => {
     var user = req.body.username;
     var pass = req.body.password;
     var info = await repo.logIn(user, pass);
+  	var priv = await repo.isPrivileged(user);
 
     if (info.success) {
         req.session.logged = true;
         req.session.username = user;
+	  	req.session.privileged = priv;
         req.session.cart = [];
 
         var items = await repo.getItems();
+	  	
+//	  console.log(req.session.privileged);
         
         res.render('index', {
             username: req.session.username, 
             items: items, 
             logged: req.session.logged, 
+		  	privileged: req.session.privileged,
             prodAmount: req.session.cart.length
         });
     }
@@ -120,7 +127,8 @@ app.post('/logout', authorize, async (req, res) => {
     res.render('index', {
         username: req.session.username, 
         items: items, 
-        logged: req.session.logged
+        logged: req.session.logged,
+	  	privileged: req.session.privileged
     });
 });
 
@@ -139,6 +147,7 @@ app.post('/query', async (req, res) => {
         username: req.session.username, 
         items: items, 
         logged: req.session.logged,
+	  	privileged: req.session.privileged,
         prodAmount: prodAmount
     });
 });
@@ -165,6 +174,7 @@ app.post('/add_to_cart', authorize, async (req, res) => {
         username: req.session.username, 
         items: items, 
         logged: req.session.logged,
+	  	privileged: req.session.privileged,
         prodAmount: req.session.cart.length
     });
 });
@@ -179,6 +189,13 @@ app.get('/cart', authorize, async (req, res) => {
     res.render('cart', {
         cart: cart
     });
+});
+
+app.get('/users', async (req, res) => {
+  	var users = await repo.getUsers();
+  	res.render('users', {
+	  	users: users
+	});
 });
 
 http.createServer(app).listen(3000);

@@ -76,7 +76,7 @@ class Repository {
                 where nick=\'${user}\';
             `);
             await client.release();
-            
+
             if (res.rows.length == 1 && res.rows[0].password == pass) {
                 return { success: true, msg: 'Zalogowano pomyślnie!'};
             }
@@ -92,6 +92,33 @@ class Repository {
             return { success: false, msg: 'Błąd logowania!' };
         }
     }
+
+  	async isPrivileged(user) {
+	  	try {
+		  	var client = await this.pool.connect();
+		  	var param = [];
+		  	param[0] = user;
+			var res = await client.query(`
+				select (privileged) from users
+			  	where nick = $1::text;`,
+			  	param
+			);
+        await client.release();
+
+		if (res.rows.length == 1 && res.rows[0].privileged == true) {
+			return true; 
+		} else {
+		  	return false;
+		}
+		}
+
+	  	catch (err) {
+		  	console.log(err);
+            return false;
+		}
+	}
+	 
+
 
   	// % - pattern matching arbitrary string
   	async getItemsMatchName(name) {
@@ -120,9 +147,9 @@ class Repository {
 		  	var param = [];
 		  	param[0] = '%' + description + '%';
             var res = await client.query(`
-			  select * from items
-			  where items.description like $1::text;`,
-			  param
+			  	select * from items
+			  	where items.description like $1::text;`,
+			  	param
 			);
             await client.release();
             return res.rows;
@@ -133,6 +160,20 @@ class Repository {
         }
     }
 
+  	async getUsers() {
+	  	try {
+		  	var client = await this.pool.connect();
+			var res = await client.query(`
+			  	select (nick) from users;`
+			);
+		  	await client.release();
+		  	return res.rows;
+		}
+	  	catch (err) {
+		  	console.log(err);
+		  	return [];
+		}
+	}
 
     end() {
         try {

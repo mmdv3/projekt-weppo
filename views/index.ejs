@@ -94,6 +94,11 @@ input#hidden {
       </form>
       <div>Liczba produktów w koszyku: <%= prodAmount %></div>
     <% } %>
+	<% if (privileged) { %>
+	<a href='users'>lista użytkowników</a>
+	<a href='products'>produkty</a>
+	<a href='orders'>zamówienia</a>
+	<% } %>
   </nav>
 </section>
 

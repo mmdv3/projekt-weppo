@@ -37,3 +37,20 @@ INSERT INTO items
 
 ALTER TABLE users
 ADD CONSTRAINT unique_nick UNIQUE (nick);
+
+CREATE TABLE orders (
+  id SERIAL,
+  ordering_user INTEGER,
+  PRIMARY KEY (id),
+  FOREIGN KEY (ordering_user) references users (id)
+);
+
+CREATE TABLE ordered_items (
+  id SERIAL,
+  order_id INTEGER,
+  product_id INTEGER,
+  product_quantity INTEGER,
+  PRIMARY KEY (id),
+  FOREIGN KEY (order_id) REFERENCES orders (id),
+  FOREIGN KEY (product_id) REFERENCES items (id)
+);
