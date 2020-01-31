@@ -118,8 +118,6 @@ class Repository {
 		}
 	}
 	 
-
-
   	// % - pattern matching arbitrary string
   	async getItemsMatchName(name) {
         try {

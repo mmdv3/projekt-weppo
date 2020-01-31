@@ -25,8 +25,17 @@ app.use((req, res, next) => {
     next();
 });
 
-function authorize(req, res, next) {
+function isLogged(req, res, next) {
     if (req.session.logged) {
+        next();
+    }
+    else {
+        res.redirect('/login');
+    }
+}
+
+function isPrivileged(req, res, next) {
+    if (req.session.privileged) {
         next();
     }
     else {
@@ -56,7 +65,6 @@ app.get('/', async (req, res) => {
         items: items, 
         logged: req.session.logged,
 	  	privileged: req.session.privileged,
-//	    privileged: true,
         prodAmount: prodAmount
     });
 });
@@ -99,9 +107,7 @@ app.post('/login', async (req, res) => {
         req.session.cart = [];
 
         var items = await repo.getItems();
-	  	
-//	  console.log(req.session.privileged);
-        
+	  	        
         res.render('index', {
             username: req.session.username, 
             items: items, 
@@ -117,10 +123,11 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.post('/logout', authorize, async (req, res) => {
+app.post('/logout', isLogged, async (req, res) => {
     req.session.username = 'gość';
     delete req.session.logged;
     delete req.session.cart;
+    delete req.session.privileged;
 
     var items = await repo.getItems();
 
@@ -152,7 +159,7 @@ app.post('/query', async (req, res) => {
     });
 });
 
-app.post('/add_to_cart', authorize, async (req, res) => {
+app.post('/add_to_cart', isLogged, async (req, res) => {
     var productID = req.body.productID;
     var quantity = Number(req.body.quantity);
     if (quantity < 0)
@@ -179,19 +186,19 @@ app.post('/add_to_cart', authorize, async (req, res) => {
     });
 });
 
-app.post('/remove_from_cart', authorize, async (req, res) => {
+app.post('/remove_from_cart', isLogged, async (req, res) => {
     req.session.cart = req.session.cart.filter(p => p.id != req.body.productID);
     res.redirect('/cart');
 });
 
-app.get('/cart', authorize, async (req, res) => {  
+app.get('/cart', isLogged, async (req, res) => {  
     var cart = await repo.getProducts(req.session.cart); 
     res.render('cart', {
         cart: cart
     });
 });
 
-app.get('/users', async (req, res) => {
+app.get('/users', isPrivileged, async (req, res) => {
   	var users = await repo.getUsers();
   	res.render('users', {
 	  	users: users
