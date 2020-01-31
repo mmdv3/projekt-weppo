@@ -7,7 +7,7 @@ class Repository {
     async getItems() {
         try {
             var client = await this.pool.connect();
-            var res = await client.query('select * from items;');
+            var res = await client.query('select * from items where available=true;');
             await client.release();
             return res.rows;
         } 
@@ -58,14 +58,12 @@ class Repository {
             );
 
             await client.release();
-
             return cart.filter(p => p);
         }
         catch (err) {
             console.log(err);
             return [];
         }
-            
     }
 
     async logIn(user, pass) {
@@ -75,6 +73,7 @@ class Repository {
                 select (password) from users 
                 where nick=\'${user}\';
             `);
+
             await client.release();
 
             if (res.rows.length == 1 && res.rows[0].password == pass) {
@@ -96,22 +95,21 @@ class Repository {
   	async isPrivileged(user) {
 	  	try {
 		  	var client = await this.pool.connect();
-		  	var param = [];
-		  	param[0] = user;
+		  	var param = [user];
 			var res = await client.query(`
 				select (privileged) from users
 			  	where nick = $1::text;`,
 			  	param
-			);
-        await client.release();
+            );
 
-		if (res.rows.length == 1 && res.rows[0].privileged == true) {
-			return true; 
-		} else {
-		  	return false;
-		}
-		}
+            await client.release();
 
+            if (res.rows.length == 1 && res.rows[0].privileged == true) {
+                return true; 
+            } else {
+                return false;
+            }
+		}
 	  	catch (err) {
 		  	console.log(err);
             return false;
@@ -122,11 +120,10 @@ class Repository {
   	async getItemsMatchName(name) {
         try {
             var client = await this.pool.connect();
-		  	var param = [];
-		  	param[0] = '%' + name + '%';
+		  	var param = ['%' + name + '%'];
             var res = await client.query(`
 			  select * from items
-			  where items.item like $1::text;`,
+			  where items.item like $1::text and available=true;`,
 			  param
 			);
             await client.release();
@@ -142,13 +139,13 @@ class Repository {
   	async getItemsMatchDesc(description) {
         try {
             var client = await this.pool.connect();
-		  	var param = [];
-		  	param[0] = '%' + description + '%';
+		  	var param = ['%' + description + '%'];
             var res = await client.query(`
 			  	select * from items
-			  	where items.description like $1::text;`,
+			  	where items.description like $1::text and available=true;`,
 			  	param
-			);
+            );
+            
             await client.release();
             return res.rows;
         } 
@@ -218,7 +215,7 @@ class Repository {
         try {
             var client = await this.pool.connect();
             await client.query(`
-                delete from items where id=\'${id}\';
+                update items set available=false where id=${id}
             `);
             return {
                 msg: 'Towar został usunięty!'
@@ -235,8 +232,7 @@ class Repository {
   	async getId(user_name) {
 	  	try {
 		  	var client = await this.pool.connect();
-		  	var param = [];
-		  	param[0] = user_name;
+		  	var param = [user_name];
 		  	var res = await client.query(`
 				select id from users where nick = $1::text;`,
 			  	param
@@ -255,11 +251,12 @@ class Repository {
 	  	try {
 		  	var client = await this.pool.connect();
 		  	var res = await client.query(`
-			insert into orders
-			(ordering_user)
-			values
-			(${user_id})
-			returning id;`);
+                insert into orders
+                (ordering_user)
+                values
+                (${user_id})
+                returning id;`
+            );
 		  	await client.release();
 		  	return res.rows[0].id;
 		}
@@ -269,7 +266,6 @@ class Repository {
 		}
 	}
 		  
-
   	async addToOrder(order_id, record) {
 	  	try {
 		  	var client = await this.pool.connect();

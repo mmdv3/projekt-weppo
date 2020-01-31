@@ -76,18 +76,15 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/register', async (req, res) => {
-    var user = req.body.username;
+    var user = req.body.username.trim();
     var pass = req.body.password;
 
-    if (user.length <= 4) {
-        var msg = 'Zbyt krótki login!'
-    }
-    else if (pass.length <= 5) {
-        var msg = 'Zbyt krótkie hasło!'
-    }
-    else {
+    if (user.length <= 4)
+        var msg = 'Zbyt krótki login!';
+    else if (pass.length <= 5)
+        var msg = 'Zbyt krótkie hasło!';
+    else
         var msg = await repo.addUser(user, pass);
-    }
     
     res.render('login', {
         msg: msg,
@@ -95,7 +92,7 @@ app.post('/register', async (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-    var user = req.body.username;
+    var user = req.body.username.trim();
     var pass = req.body.password;
     var info = await repo.logIn(user, pass);
   	var priv = await repo.isPrivileged(user);
@@ -125,6 +122,7 @@ app.post('/login', async (req, res) => {
 
 app.post('/logout', isLogged, async (req, res) => {
     req.session.username = 'gość';
+
     delete req.session.logged;
     delete req.session.cart;
     delete req.session.privileged;
@@ -140,13 +138,12 @@ app.post('/logout', isLogged, async (req, res) => {
 });
 
 app.post('/query', async (req, res) => {
-  	if (req.body.query_type == 'name') {
-	  var items = await repo.getItemsMatchName(req.body.query_key);
-	} else if (req.body.query_type == 'desc') {
-	  var items = await repo.getItemsMatchDesc(req.body.query_key);
-	} else {
-	  var items = await repo.getItems();
-	}
+  	if (req.body.query_type == 'name')
+	    var items = await repo.getItemsMatchName(req.body.query_key);
+	else if (req.body.query_type == 'desc')
+	    var items = await repo.getItemsMatchDesc(req.body.query_key);
+	else
+	    var items = await repo.getItems();
 
     var prodAmount = req.session.logged ? req.session.cart.length : 0;
 
@@ -166,14 +163,12 @@ app.post('/add_to_cart', isLogged, async (req, res) => {
         quantity = 0;
 
     var prod = req.session.cart.find(p => p.id == productID);
-    if (prod) {
+    if (prod)
         prod.quantity = Number(prod.quantity) + quantity;
-    }
-    else if (quantity > 0) {
+    else if (quantity > 0)
         req.session.cart.push(
             new Product(productID, quantity)
         );
-    }
 
     var items = await repo.getItems();
 
@@ -211,7 +206,7 @@ app.post('/make_order', isLogged, async (req, res) => {
     await req.session.cart.forEach(async (record) => {
       await repo.addToOrder(order_id, record);
     });
-    delete req.session.cart;
+    // delete req.session.cart;
     req.session.cart = [];
     res.redirect('finished_order');
 });

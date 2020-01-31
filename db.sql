@@ -9,7 +9,7 @@ CREATE TABLE users (
 INSERT INTO users
 	(nick, password, privileged)
 VALUES
-	('admin', 'admin', TRUE) ;
+	('admin', 'admin', TRUE);
 
 CREATE TABLE items (
 	id SERIAL,
@@ -54,3 +54,7 @@ CREATE TABLE ordered_items (
   FOREIGN KEY (order_id) REFERENCES orders (id),
   FOREIGN KEY (product_id) REFERENCES items (id)
 );
+
+ALTER TABLE items
+	ADD available BOOL
+	DEFAULT (FALSE);
