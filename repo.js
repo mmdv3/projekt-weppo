@@ -173,6 +173,64 @@ class Repository {
 		}
 	}
 
+  	async getId(user_name) {
+	  	try {
+		  	var client = await this.pool.connect();
+		  	var param = [];
+		  	param[0] = user_name;
+		  	var res = await client.query(`
+				select id from users where nick = $1::text;`,
+			  	param
+			);
+		  	await client.release();
+		  	return res.rows[0].id;
+		}
+	  	catch (err) {
+		  console.log(err);
+		  return -1;
+		}
+	}
+		  	
+
+  	async newOrder(user_id) {
+	  	try {
+		  	var client = await this.pool.connect();
+		  	var res = await client.query(`
+			insert into orders
+			(ordering_user)
+			values
+			(${user_id})
+			returning id;`);
+		  	await client.release();
+		  	return res.rows[0].id;
+		}
+	  	catch (err) {
+		  console.log(err);
+		  return -1;
+		}
+	}
+		  
+
+  	async addToOrder(order_id, record) {
+	  	try {
+		  	var client = await this.pool.connect();
+		  	var param = [];
+		  	param[0] = order_id;
+		  	param[1] = record.id;
+		  	param[2] = record.quantity;
+		  	var res = await client.query(`
+				insert into ordered_items
+				(order_id, product_id, product_quantity)
+				values
+				($1::integer, $2::integer, $3::integer);`,
+			  	param
+			);
+		}
+	  	catch (err) {
+		  console.log(err);
+		}
+	}
+
     end() {
         try {
             return this.pool.end();

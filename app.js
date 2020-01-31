@@ -205,4 +205,19 @@ app.get('/users', isPrivileged, async (req, res) => {
 	});
 });
 
+app.post('/make_order', isLogged, async (req, res) => {
+    var user = await repo.getId(req.session.username);
+    var order_id = await repo.newOrder(user);
+    await req.session.cart.forEach(async (record) => {
+      await repo.addToOrder(order_id, record);
+    });
+    delete req.session.cart;
+    req.session.cart = [];
+    res.redirect('finished_order');
+});
+
+app.get('/finished_order', isLogged, async (req, res) => {
+  	res.render('finished_order');
+});
+
 http.createServer(app).listen(3000);
