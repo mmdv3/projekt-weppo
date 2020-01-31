@@ -100,6 +100,17 @@ input#hidden {
 <section>
   <article>
 	<table width = "100%" border = "1">
+	  <tr>
+		<form method="POST" action="query">
+		  <input type="text" name="query_key">
+		  szukaj według
+		  <select name="query_type">
+			<option value="name">Nazwa</option>
+			<option value="desc">Opis</option>
+		  </select>
+		  <button>Szukaj</button>
+		</form>
+	  </tr>
   <% items.forEach((v) => { %>
 	  <tr>
 		  <td>

@@ -93,6 +93,47 @@ class Repository {
         }
     }
 
+  	// % - pattern matching arbitrary string
+  	async getItemsMatchName(name) {
+        try {
+            var client = await this.pool.connect();
+		  	var param = [];
+		  	param[0] = '%' + name + '%';
+            var res = await client.query(`
+			  select * from items
+			  where items.item like $1::text;`,
+			  param
+			);
+            await client.release();
+            return res.rows;
+        } 
+	  	
+        catch (err) {
+            console.log(err);
+            return [];
+        }
+    }
+
+  	async getItemsMatchDesc(description) {
+        try {
+            var client = await this.pool.connect();
+		  	var param = [];
+		  	param[0] = '%' + description + '%';
+            var res = await client.query(`
+			  select * from items
+			  where items.description like $1::text;`,
+			  param
+			);
+            await client.release();
+            return res.rows;
+        } 
+        catch (err) {
+            console.log(err);
+            return [];
+        }
+    }
+
+
     end() {
         try {
             return this.pool.end();

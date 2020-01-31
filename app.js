@@ -124,6 +124,25 @@ app.post('/logout', authorize, async (req, res) => {
     });
 });
 
+app.post('/query', async (req, res) => {
+  	if (req.body.query_type == 'name') {
+	  var items = await repo.getItemsMatchName(req.body.query_key);
+	} else if (req.body.query_type == 'desc') {
+	  var items = await repo.getItemsMatchDesc(req.body.query_key);
+	} else {
+	  var items = await repo.getItems();
+	}
+
+    var prodAmount = req.session.logged ? req.session.cart.length : 0;
+
+    res.render('index', {
+        username: req.session.username, 
+        items: items, 
+        logged: req.session.logged,
+        prodAmount: prodAmount
+    });
+});
+
 app.post('/add_to_cart', authorize, async (req, res) => {
     var productID = req.body.productID;
     var quantity = Number(req.body.quantity);
