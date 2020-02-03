@@ -98,12 +98,11 @@ app.post('/login', async (req, res) => {
     var user = req.body.username.trim();
     var pass = req.body.password;
     var info = await repo.logIn(user, pass);
-  	var priv = await repo.isPrivileged(user);
-
+      
     if (info.success) {
         req.session.logged = true;
         req.session.username = user;
-	  	req.session.privileged = priv;
+	  	req.session.privileged = info.priv;
         req.session.cart = [];
 
         var items = await repo.getItems();
@@ -213,15 +212,14 @@ app.post('/make_order', isLogged, async (req, res) => {
     await req.session.cart.forEach(async (record) => {
       await repo.addToOrder(order_id, record);
     });
-    // delete req.session.cart;
     req.session.cart = [];
     res.redirect('finished_order');
 });
 
 app.get('/finished_order', isLogged, async (req, res) => {
-      res.render('finished_order', {
-		username: req.session.username
-	  });
+    res.render('finished_order', {
+    	username: req.session.username
+	});
 });
 
 app.get('/products', isPrivileged, (req, res) => {
@@ -249,6 +247,7 @@ app.post('/modify', isPrivileged, async (req, res) => {
 
     res.render('edit', {
         items: items,
+        username: req.session.username,
         msg: info.msg
     });
 });
@@ -261,7 +260,8 @@ app.post('/remove', isPrivileged, async (req, res) => {
 
     res.render('edit', {
         items: items,
-        msg: info.msg
+        msg: info.msg,
+        username: req.session.username
     })
 });
 
@@ -279,7 +279,8 @@ app.post('/add', isPrivileged, async (req, res) => {
     var info = await repo.addItem(name, desc);
 
     res.render('add', {
-        msg: info.msg
+        msg: info.msg,
+        username: req.session.username
     });
 });
 
