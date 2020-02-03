@@ -70,15 +70,14 @@ class Repository {
         try {
             var client = await this.pool.connect();
             var res = await client.query(`
-                select (password) from users 
+                select * from users 
                 where nick=\'${user}\';
             `);
 
             await client.release();
 
-            if (res.rows.length == 1 && res.rows[0].password == pass) {
-                return { success: true, msg: 'Zalogowano pomyślnie!'};
-            }
+            if (res.rows.length == 1 && res.rows[0].password == pass)
+                return { success: true, msg: 'Zalogowano pomyślnie!', priv: res.rows[0].privileged };
             else {
                 if (res.rows.length != 1)
                     return { success: false, msg: 'Podany login nie istnieje!'};
@@ -91,40 +90,15 @@ class Repository {
             return { success: false, msg: 'Błąd logowania!' };
         }
     }
-
-  	async isPrivileged(user) {
-	  	try {
-		  	var client = await this.pool.connect();
-		  	var param = [user];
-			var res = await client.query(`
-				select (privileged) from users
-			  	where nick = $1::text;`,
-			  	param
-            );
-
-            await client.release();
-
-            if (res.rows.length == 1 && res.rows[0].privileged == true) {
-                return true; 
-            } else {
-                return false;
-            }
-		}
-	  	catch (err) {
-		  	console.log(err);
-            return false;
-		}
-	}
 	 
-  	// % - pattern matching arbitrary string
   	async getItemsMatchName(name) {
         try {
             var client = await this.pool.connect();
 		  	var param = ['%' + name + '%'];
             var res = await client.query(`
-			  select * from items
-			  where items.item like $1::text and available=true;`,
-			  param
+                select * from items
+                where items.item like $1::text and available=true;`,
+                param
 			);
             await client.release();
             return res.rows;
@@ -179,15 +153,11 @@ class Repository {
                     values
                     (\'${name}\', \'${desc}\');
             `);
-            return {
-                msg: 'Towar dodano pomyślnie!'
-            };
+            return { msg: 'Towar dodano pomyślnie!' };
         }
         catch (err) {
             console.log(err);
-            return {
-                msg: 'Niepowodzenie'
-            };
+            return { msg: 'Niepowodzenie' };
         }
     }
 
@@ -199,15 +169,11 @@ class Repository {
                 set item=\'${newName}\', description=\'${newDesc}\'
                 where id=${id};
             `);
-            return {
-                msg: 'Towar został zmodyfikowany!'
-            };
+            return { msg: 'Towar został zmodyfikowany!' };
         }
         catch (err) {
             console.log(err);
-            return {
-                msg: 'Niepowodzenie!'
-            };
+            return { msg: 'Niepowodzenie!' };
         }
     }
 
@@ -215,17 +181,13 @@ class Repository {
         try {
             var client = await this.pool.connect();
             await client.query(`
-                update items set available=false where id=${id}
+                update items set available=false where id=${id};
             `);
-            return {
-                msg: 'Towar został usunięty!'
-            };
+            return { msg: 'Towar został usunięty!' };
         }
         catch (err) {
             console.log(err);
-            return {
-                msg: 'Niepowodzenie!'
-            };
+            return { msg: 'Niepowodzenie!' };
         }
     }
 
@@ -269,10 +231,7 @@ class Repository {
   	async addToOrder(order_id, record) {
 	  	try {
 		  	var client = await this.pool.connect();
-		  	var param = [];
-		  	param[0] = order_id;
-		  	param[1] = record.id;
-		  	param[2] = record.quantity;
+		  	var param = [order_id, record.id, record.quantity];
 		  	var res = await client.query(`
 				insert into ordered_items
 				(order_id, product_id, product_quantity)
@@ -284,7 +243,7 @@ class Repository {
 	  	catch (err) {
 		  console.log(err);
 		}
-	}
+    }
 
     end() {
         try {
