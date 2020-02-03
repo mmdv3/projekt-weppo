@@ -3,8 +3,11 @@ const express = require('express');
 const session = require('express-session');
 const pg = require('pg');
 const Repository = require('./repo.js');
+const fs = require('fs');
+
 
 const app = express();
+app.use(express.static( "public" ));
 app.set('view engine', 'ejs');
 app.set('views', './views');
 
@@ -14,26 +17,33 @@ app.use(session({
     saveUninitialized: true
 }));
 
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({
+    extended: true
+}));
 
 app.use((req, res, next) => {
-    if (!req.session.username)
-        req.session.username = 'gość';
+    if (!req.session.username) {
+        req.session.username = 'guest';
+    }
     next();
 });
 
 function isLogged(req, res, next) {
-    if (req.session.logged)
+    if (req.session.logged) {
         next();
-    else
+    }
+    else {
         res.redirect('/login');
+    }
 }
 
 function isPrivileged(req, res, next) {
-    if (req.session.privileged)
+    if (req.session.privileged) {
         next();
-    else
+    }
+    else {
         res.redirect('/login');
+    }
 }
 
 class Product {
@@ -63,7 +73,9 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-    res.render('login', { msg: '' });
+    res.render('login', {
+        msg: ''
+    });
 });
 
 app.post('/register', async (req, res) => {
@@ -77,18 +89,21 @@ app.post('/register', async (req, res) => {
     else
         var msg = await repo.addUser(user, pass);
     
-    res.render('login', { msg: msg });
+    res.render('login', {
+        msg: msg,
+    });
 });
 
 app.post('/login', async (req, res) => {
     var user = req.body.username.trim();
     var pass = req.body.password;
     var info = await repo.logIn(user, pass);
+  	var priv = await repo.isPrivileged(user);
 
     if (info.success) {
         req.session.logged = true;
         req.session.username = user;
-	  	req.session.privileged = info.priv;
+	  	req.session.privileged = priv;
         req.session.cart = [];
 
         var items = await repo.getItems();
@@ -101,11 +116,14 @@ app.post('/login', async (req, res) => {
             prodAmount: req.session.cart.length
         });
     }
-    else
-        res.render('login', { msg: info.msg });
+    else {
+        res.render('login', {
+            msg: info.msg
+        });
+    }
 });
 
-app.post('/logout', isLogged, async (req, res) => {
+app.get('/logout', isLogged, async (req, res) => {
     req.session.username = 'gość';
 
     delete req.session.logged;
@@ -173,36 +191,50 @@ app.post('/remove_from_cart', isLogged, async (req, res) => {
 
 app.get('/cart', isLogged, async (req, res) => {  
     var cart = await repo.getProducts(req.session.cart); 
-    res.render('cart', { cart: cart });
+    res.render('cart', {
+        cart: cart,
+	  	username: req.session.username,
+	  	prodAmount: req.session.cart.length,
+	  	privileged: req.session.privileged,
+    });
 });
 
 app.get('/users', isPrivileged, async (req, res) => {
   	var users = await repo.getUsers();
-  	res.render('users', { users: users });
+  	res.render('users', {
+	  	users: users,
+	  	username: req.session.username
+	});
 });
 
 app.post('/make_order', isLogged, async (req, res) => {
     var user = await repo.getId(req.session.username);
     var order_id = await repo.newOrder(user);
     await req.session.cart.forEach(async (record) => {
-        await repo.addToOrder(order_id, record);
+      await repo.addToOrder(order_id, record);
     });
+    // delete req.session.cart;
     req.session.cart = [];
     res.redirect('finished_order');
 });
 
 app.get('/finished_order', isLogged, async (req, res) => {
-      res.render('finished_order');
+      res.render('finished_order', {
+		username: req.session.username
+	  });
 });
 
 app.get('/products', isPrivileged, (req, res) => {
-    res.render('products');
+    res.render('products', {
+	  username: req.session.username}
+	);
 });
 
 app.get('/edit_products', isPrivileged, async (req, res) => {
     var items = await repo.getItems();
     res.render('edit', {
         items: items,
+	  	username: req.session.username,
         msg: ''
     });
 });
@@ -234,22 +266,22 @@ app.post('/remove', isPrivileged, async (req, res) => {
 });
 
 app.get('/add_products', isPrivileged, (req, res) => {
-    res.render('add', { msg: '' });
+    res.render('add', {
+        msg: '',
+	  	username: req.session.username
+    });
 });
 
 app.post('/add', isPrivileged, async (req, res) => {
     var name = req.body.name;
     var desc = req.body.description;
+    
     var info = await repo.addItem(name, desc);
-    res.render('add', { msg: info.msg });
+
+    res.render('add', {
+        msg: info.msg
+    });
 });
 
-app.get('/orders', isPrivileged, async (req, res) => {
-    res.end('do zrobienia');
-});
-
-app.get('*', (req, res) => {
-    res.end('Nie znaleziono strony!');
-});
 
 http.createServer(app).listen(3000);

@@ -82,7 +82,7 @@ class Repository {
                 if (res.rows.length != 1)
                     return { success: false, msg: 'Podany login nie istnieje!'};
                 else
-                    return { success: false, msg: 'Nieprawidłowe hasło!'};
+                    return { success: false, msg: 'Invalid password!'};
             }
         }
         catch (err) {
@@ -116,7 +116,7 @@ class Repository {
 		  	var param = ['%' + description + '%'];
             var res = await client.query(`
 			  	select * from items
-			  	where items.description like $1::text and available=true;`,
+			  	where items.description_short like $1::text and available=true;`,
 			  	param
             );
             
