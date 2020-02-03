@@ -3,8 +3,11 @@ const express = require('express');
 const session = require('express-session');
 const pg = require('pg');
 const Repository = require('./repo.js');
+const fs = require('fs');
+
 
 const app = express();
+app.use(express.static( "public" ));
 app.set('view engine', 'ejs');
 app.set('views', './views');
 
@@ -20,7 +23,7 @@ app.use(express.urlencoded({
 
 app.use((req, res, next) => {
     if (!req.session.username) {
-        req.session.username = 'gość';
+        req.session.username = 'guest';
     }
     next();
 });
@@ -120,7 +123,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.post('/logout', isLogged, async (req, res) => {
+app.get('/logout', isLogged, async (req, res) => {
     req.session.username = 'gość';
 
     delete req.session.logged;
@@ -189,14 +192,18 @@ app.post('/remove_from_cart', isLogged, async (req, res) => {
 app.get('/cart', isLogged, async (req, res) => {  
     var cart = await repo.getProducts(req.session.cart); 
     res.render('cart', {
-        cart: cart
+        cart: cart,
+	  	username: req.session.username,
+	  	prodAmount: req.session.cart.length,
+	  	privileged: req.session.privileged,
     });
 });
 
 app.get('/users', isPrivileged, async (req, res) => {
   	var users = await repo.getUsers();
   	res.render('users', {
-	  	users: users
+	  	users: users,
+	  	username: req.session.username
 	});
 });
 
@@ -212,17 +219,22 @@ app.post('/make_order', isLogged, async (req, res) => {
 });
 
 app.get('/finished_order', isLogged, async (req, res) => {
-      res.render('finished_order');
+      res.render('finished_order', {
+		username: req.session.username
+	  });
 });
 
 app.get('/products', isPrivileged, (req, res) => {
-    res.render('products');
+    res.render('products', {
+	  username: req.session.username}
+	);
 });
 
 app.get('/edit_products', isPrivileged, async (req, res) => {
     var items = await repo.getItems();
     res.render('edit', {
         items: items,
+	  	username: req.session.username,
         msg: ''
     });
 });
@@ -255,7 +267,8 @@ app.post('/remove', isPrivileged, async (req, res) => {
 
 app.get('/add_products', isPrivileged, (req, res) => {
     res.render('add', {
-        msg: ''
+        msg: '',
+	  	username: req.session.username
     });
 });
 
@@ -269,5 +282,6 @@ app.post('/add', isPrivileged, async (req, res) => {
         msg: info.msg
     });
 });
+
 
 http.createServer(app).listen(3000);
