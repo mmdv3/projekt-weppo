@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="pl">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="keywords" content="" />
+  <meta name="description" content="" />
+
+  <link href="templatemo_style.css" rel="stylesheet" type="text/css" />
+
+  <title>List of users</title>
+
+</head>
+
+<body>
+  <!--  Free CSS Templates from www.templatemo.com -->
+  <div id="templatemo_container">
+	<div id="templatemo_menu">
+	  <ul>
+		<li><a href='/'>Main page</a></li>
+		<li> User name: <%= username %> </li>
+		<li><a href="logout">Log out</li>
+	<li><a href='users'>List of users</a></li>
+	<li><a href='products'>products</a></li>
+	<li><a href='orders'>orders</a></li>
+
+    	</ul>
+    </div> <!-- end of menu -->
+    
+    <div id="templatemo_header">
+    	<div id="templatemo_special_offers">
+        	<p>
+                <span>25%</span> discounts for
+        purchase over $80
+        	</p>
+			<a href="subpage.html" style="margin-left: 50px;">Read more...</a>
+        </div>
+        
+        
+        <div id="templatemo_new_books">
+        	<ul>
+                <li>Suspen disse</li>
+                <li>Maece nas metus</li>
+                <li>In sed risus ac feli</li>
+            </ul>
+            <a href="subpage.html" style="margin-left: 50px;">Read more...</a>
+        </div>
+    </div> <!-- end of header -->
+    
+    <div id="templatemo_content">
+        <div id="templatemo_content_users">
+            <div class="templatemo_content_mid_section">
+                <h1>List of users</h1>
+                <ul>
+				  <% users.forEach((p) => { %>
+				  <li> <%= p.nick %> </li>
+				  <% }); %>
+				</ul>
+			</div> <!-- end of content left section -->
+        </div> <!-- end of content left -->
+
+    	<div class="cleaner_with_height">&nbsp;</div>
+    </div> <!-- end of content -->
+    
+    <div id="templatemo_footer">
+    
+	       <a href="subpage.html">Home</a> | <a href="subpage.html">Search</a> | <a href="subpage.html">Books</a> | <a href="#">New Releases</a> | <a href="#">FAQs</a> | <a href="#">Contact Us</a><br />
+        Copyright © 2024 <a href="#"><strong>Your Company Name</strong></a> 
+        <!-- Credit: www.templatemo.com -->	</div> 
+    <!-- end of footer -->
+<!--  Free CSS Template www.templatemo.com -->
+</div> <!-- end of container -->
+<!-- templatemo 086 book store -->
+<!-- 
+Book Store Template 
+http://www.templatemo.com/preview/templatemo_086_book_store 
+-->
+</body>
+</html>

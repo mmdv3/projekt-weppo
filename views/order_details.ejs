@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Edytuj</title>
+    <title>Szczegóły zamówienia</title>
     <link rel="stylesheet" type="text/css" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <link rel="stylesheet" type="text/css" href="css/owl.carousel.min.css">
@@ -19,7 +19,7 @@
 						<li><a href='users'>Użytkownicy</a></li>
 						<li><a href='products'>Produkty</a></li>
 						<li><a href='orders'>Zamówienia</a></li>
-					<% } %>
+					<% } %>      
                 </ul>
             </div>
 
@@ -42,7 +42,11 @@
        </a>
     </div>
 
-    <div style="padding: 200px;">
+    <div class="leftText" style="padding-top: 150px;">
+        <h1>Zamówienie nr: <%= orderID %></h1>
+    </div>
+
+    <div style="margin: 0px 50px; padding-top:70px;">
         <table class="table">
           <thead class="thead-light">
             <tr>
@@ -50,45 +54,16 @@
               <th scope="col">Nazwa produktu</th>
               <th scope="col">Cena</th>
               <th scope="col">Kod produktu</th>
-              <th scope="col">Ścieżka do zdjęcia</th>
             </tr>
           </thead>
           <tbody>
             <% var id = 1; %>
-            <% items.forEach((v) => { %>
+            <% details.forEach((d) => { %>
                 <tr>
                     <th scope="row"><%= id %></th>
-                    <form method="POST">
-                        <th>
-                            <div class="form-inline">
-                                <input type="text" value="<%= v.name %>" name="name"> 
-                            </div>
-                        </th>
-                        <th>
-                            <div class="form-inline">
-                                <input type="number" value="<%= v.price %>" name="price"> 
-                            </div>
-                        </th>
-                        <th>
-                            <div class="form-inline">
-                                <input type="text" value="<%= v.code %>" name="code"> 
-                            </div>
-                        </th>
-                        <th>
-                            <div class="form-inline">
-                                <input type="text" value="<%= v.image %>" name="image"> 
-                            </div>
-                        </th>
-                        <input type="text" hidden="true" name="id" value="<%= v.id %>">
-                        <th>
-                            <div class="form-inline">
-                                <button class="btn btn-primary" style="background-color: orange; border-color:orange;" formaction="modify">Modyfikuj</button>
-                            </div>
-                            <div class="form-inline">
-                                <button class="btn btn-primary" style="background-color: orange; border-color:orange; margin-top:10px;" formaction="remove">Usuń</button>
-                            </div>
-                        </th>
-                    </form>
+                    <th><%= d.name %></th>
+                    <th><%= d.price %> zł</th>
+                    <th><%= d.code %></th>
                 </tr>
                 <% ++id %>
             <% }); %>
@@ -96,11 +71,6 @@
         </table>
     </div>
 
-    <div class="centeredText">
-		<h3>
-			<%= msg %>
-		</h3>
-	</div>
 
 <script src="js/jquery-3.3.1.min.js"></script>
 <script src="js/jquery.cycle.js"></script>

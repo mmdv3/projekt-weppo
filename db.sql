@@ -1,106 +1,64 @@
+DROP TABLE ordered_items;
+DROP TABLE orders;
+DROP TABLE users;
+DROP TABLE items;
+
 CREATE TABLE users (
 	id SERIAL,
-	nick VARCHAR(20),
+	username VARCHAR(20),
 	password VARCHAR(20),
 	privileged BOOLEAN,
 	PRIMARY KEY (id)	
 );
 
 INSERT INTO users
-	(nick, password, privileged)
+	(username, password, privileged)
 VALUES
 	('admin', 'admin', TRUE);
 
 CREATE TABLE items (
 	id SERIAL,
-	item VARCHAR(40),
-	author VARCHAR(40),
-	description VARCHAR(3000),
-	description_short VARCHAR(100),
+	name VARCHAR(60),
+	price int,
+	code VARCHAR(40),
 	image VARCHAR(60),
-	price MONEY,
+	available BOOL,
 	PRIMARY KEY (id)
 );
 
 INSERT INTO items
-	(item, author, description, description_short, image, price)
-	VALUES
-	('Photography',
-	  'Best Author',
-	  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus nec dui. Donec nec neque ut quam sodales feugiat. Nam sodales, pede vel dapibus lobortis, ipsum diam molestie risus, a vulputate risus nisl pulvinar lacus.',
-	  'Etiam luctus. Quisque facilisis suscipit elit. Curabitur...',
-	  'images/templatemo_image_01.jpg',
-	  55),
-	('Photography 2',
-	  'Best Author',
-	  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus nec dui. Donec nec neque ut quam sodales feugiat. Nam sodales, pede vel dapibus lobortis, ipsum diam molestie risus, a vulputate risus nisl pulvinar lacus.',
-	  'Etiam luctus. Quisque facilisis suscipit elit. Curabitur...',
-	  'images/templatemo_image_01.jpg',
-	  55),
-	('Photography 3',
-	  'Best Author',
-	  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus nec dui. Donec nec neque ut quam sodales feugiat. Nam sodales, pede vel dapibus lobortis, ipsum diam molestie risus, a vulputate risus nisl pulvinar lacus.',
-	  'Etiam luctus. Quisque facilisis suscipit elit. Curabitur...',
-	  'images/templatemo_image_01.jpg',
-	  55),
-	('Cooking',
-	  'New Author',
-	  '',
-	  'Aliquam a dui, ac magna quis est eleifend dictum.',
-	  'images/templatemo_image_02.jpg',
-	  35),
-	('Cooking 2',
-	  'New Author',
-	  '',
-	  'Aliquam a dui, ac magna quis est eleifend dictum.',
-	  'images/templatemo_image_02.jpg',
-	  35),
-	('Cooking 3',
-	  'New Author',
-	  '',
-	  'Aliquam a dui, ac magna quis est eleifend dictum.',
-	  'images/templatemo_image_02.jpg',
-	  35),
-	('Gardening',
-	  'Famous Author',
-	  '',
-	  'Ut fringilla enim sed turpis. Sed justo dolor, convallis at.',
-	  'images/templatemo_image_03.jpg',
-	  65),
-	('Gardening 2',
-	  'Famous Author',
-	  '',
-	  'Ut fringilla enim sed turpis. Sed justo dolor, convallis at.',
-	  'images/templatemo_image_03.jpg',
-	  65),
-	('Gardening 3',
-	  'Famous Author',
-	  '',
-	  'Ut fringilla enim sed turpis. Sed justo dolor, convallis at.',
-	  'images/templatemo_image_03.jpg',
-	  65),
-	('Sushi Book',
-	  'Japanese Name',
-	  '',
-	  'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-	  'images/templatemo_image_04.jpg',
-	  45),
-	('Sushi Book 2',
-	  'Japanese Name',
-	  '',
-	  'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-	  'images/templatemo_image_04.jpg',
-	  45),
-	('Sushi Book 3',
-	  'Japanese Name',
-	  '',
-	  'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-	  'images/templatemo_image_04.jpg',
-	  45)
-; 
+	(name, price, code, image)
+	values
+	('Apple Macbook Pro MQ032 14.5" Intel Core i7 5550U 8GB DDR3',
+	 999, 'GA00006488', 'images/product-img1.jpg'),
+	('Apple Macbook Pro MQ032 14.5" Intel Core i7 5550U 8GB DDR3',
+	 255, 'GA00006488', 'images/product-img2.jpg'),
+	('Apple Macbook Pro MQ032 14.5" Intel Core i7 5550U 8GB DDR3',
+	 444, 'GA00006488', 'images/product-img3.jpg'),
+	('Apple Macbook Pro MQ032 14.5" Intel Core i7 5550U 8GB DDR3',
+	 598, 'GA00006488', 'images/product-img4.jpg'),
+	('Apple Macbook Pro MQ032 14.5" Intel Core i7 5550U 8GB DDR3',
+	 999, 'GA00006488', 'images/product-img4.jpg'),
+	('Apple Macbook Pro MQ032 14.5" Intel Core i7 5550U 8GB DDR3',
+	 255, 'GA00006488', 'images/product-img3.jpg'),
+	('Apple Macbook Pro MQ032 14.5" Intel Core i7 5550U 8GB DDR3',
+	 598, 'GA00006488', 'images/product-img1.jpg'),
+	('Apple Macbook Pro MQ032 14.5" Intel Core i7 5550U 8GB DDR3',
+	 49, 'GA00006488', 'images/product-img2.jpg'),
+	('Apple Macbook Pro MQ032 14.5" Intel Core i7 5550U 8GB DDR3',
+	 49, 'GA00006488', 'images/product-img5.jpg'),
+	('Apple Macbook Pro MQ032 14.5" Intel Core i7 5550U 8GB DDR3',
+	 542, 'GA00006488', 'images/product-img6.jpg'),
+	('Apple Macbook Pro MQ032 14.5" Intel Core i7 5550U 8GB DDR3',
+	 49, 'GA00006488', 'images/product-img7.jpg'),
+	('Apple Macbook Pro MQ032 14.5" Intel Core i7 5550U 8GB DDR3',
+	 322, 'GA00006488', 'images/product-img8.jpg'),
+	('Apple Macbook Pro MQ032 14.5" Intel Core i7 5550U 8GB DDR3',
+	 111, 'GA00006488', 'images/product-img1.jpg')
+;
 
 ALTER TABLE users
-ADD CONSTRAINT unique_nick UNIQUE (nick);
+ADD CONSTRAINT unique_nick UNIQUE (username);
 
 CREATE TABLE orders (
   id SERIAL,

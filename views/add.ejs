@@ -1,84 +1,146 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html lang="pl">
-<html xmlns="http://www.w3.org/1999/xhtml">
-
+<!DOCTYPE html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <meta name="keywords" content="" />
-  <meta name="description" content="" />
-
-  <link href="templatemo_style.css" rel="stylesheet" type="text/css" />
-
-  <title></title>
-
+	<title>Dodaj produkt</title>
+	<!-- Font Awesome, Style -->
+	<link rel="stylesheet" type="text/css" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link rel="stylesheet" type="text/css" href="css/owl.carousel.min.css">
+	<link rel="stylesheet" type="text/css" href="css/smoothproducts.css">
 </head>
-
 <body>
-  <!--  Free CSS Templates from www.templatemo.com -->
-  <div id="templatemo_container">
-	<div id="templatemo_menu">
-	  <ul>
-		<li><a href='/'>Strona główna</a></li>
-		<li> Nazwa użytkownika: <%= username %> </li>
-		<li><a href="logout">Wyloguj się</li>
-	<li><a href='users'>lista użytkowników</a></li>
-	<li><a href='products'>produkty</a></li>
-	<li><a href='orders'>zamówienia</a></li>
+	<!-- Topbar Start -->
+	<div class="topbar">
+        <div class="container">
+             
+            <div class="topcenter">
+                <ul>
+                    <li><a href="/">Strong główna</a></li>
+                    <li><a href="contact">Kontakt</a></li>
+					<% if (privileged) { %>
+						<li><a href='users'>Użytkownicy</a></li>
+						<li><a href='products'>Produkty</a></li>
+						<li><a href='orders'>Zamówienia</a></li>
+					<% } %>
+                </ul>
+            </div>
 
-    	</ul>
-    </div> <!-- end of menu -->
-    
-    <div id="templatemo_header">
-    	<div id="templatemo_special_offers">
-        	<p>
-                <span>25%</span> discounts for
-        purchase over $80
-        	</p>
-			<a href="subpage.html" style="margin-left: 50px;">Read more...</a>
+            <div class="topright">
+                <ul>
+                    <li><a href="#"><i class="fas fa-phone"></i> (+48)123456789</a></li>
+                    <li>Nazwa użytkownika: <%= username %></li>
+                </ul>
+            </div>
         </div>
-        
-        
-        <div id="templatemo_new_books">
-        	<ul>
-                <li>Suspen disse</li>
-                <li>Maece nas metus</li>
-                <li>In sed risus ac feli</li>
-            </ul>
-            <a href="subpage.html" style="margin-left: 50px;">Read more...</a>
-        </div>
-    </div> <!-- end of header -->
-        <div>
-            <form method="POST" action="add">
-                <div>
-                    Nazwa: <input type="text" name="name">
-                </div>
-                <div>
-                    Opis: <input type="text" name="description">
-                </div>
-                <button>Dodaj</button>
-            </form>
-            <%= msg %>
-        </div>
-    
+    </div>
 
-            <a href="subpage.html"><img src="images/templatemo_ads.jpg" alt="ads" /></a>
-    	<div class="cleaner_with_height">&nbsp;</div>
-    </div> <!-- end of content -->
-    
-    <div id="templatemo_footer">
-    
-	       <a href="subpage.html">Home</a> | <a href="subpage.html">Search</a> | <a href="subpage.html">Books</a> | <a href="#">New Releases</a> | <a href="#">FAQs</a> | <a href="#">Contact Us</a><br />
-        Copyright © 2024 <a href="#"><strong>Your Company Name</strong></a> 
-        <!-- Credit: www.templatemo.com -->	</div> 
-    <!-- end of footer -->
-<!--  Free CSS Template www.templatemo.com -->
-</div> <!-- end of container -->
-<!-- templatemo 086 book store -->
-<!-- 
-Book Store Template 
-http://www.templatemo.com/preview/templatemo_086_book_store 
--->
+    <div class="header">
+        <a href="/">
+           <div class="container">
+               <div class="logo">
+                   <img src="images/logo.png">
+               </div>
+           </div>
+       </a>
+    </div>
+
+	<div class="checkout">
+		<div class="container">
+			<h2>Dodawanie nowego produktu</h2>
+
+			<div class="checkout-inner">
+				<form method="POST" action="add">
+					<div class="checkout-form-steps">
+						<h4>Szczegóły produktu</h4>
+						<input type="text" class="textfield" placeholder="Nazwa produktu" name="name" required="true">
+						<input type="number" class="textfield" placeholder="Cena" name="price" required="true">
+						<input type="text" class="textfield" placeholder="Kod produktu" name="code" required="true">
+						<input type="text" class="textfield" placeholder="Ścieżka do zdjęcia" name="image">
+					</div>
+					<input type="submit" class="submitorder-button" value="Dodaj">
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="centeredText">
+		<h3>
+			<%= msg %>
+		</h3>
+	</div>
+	
+
+<!-- Jquery V.3.3.1 -->
+<script src="js/jquery-3.3.1.min.js"></script>
+<script src="js/jquery.cycle.js"></script>
+<script src="js/owl.carousel.min.js"></script>
+<script src="js/smoothproducts.min.js"></script>
+<script>
+	$("#sliderShuffle").cycle({
+		next: '#next',
+		prev: '#prev'
+	});
+	
+	$('.owl-carousel').owlCarousel({
+		items:4,
+		loop:true,
+		margin:15,
+		autoplay:true,
+		autoplayTimeout:3000, //3 Second
+		nav:true,
+		responsiveClass:true,
+		responsive:{
+			0:{
+				items:1,
+				nav:true
+			},
+			600:{
+				items:3,
+				nav:true
+			},
+			1000:{
+				items:4,
+				nav:true
+			}
+		}
+
+	});
+
+	$(function(){
+		$(".topbar ul li").click(function(){
+			$(".topbar ul li").not(this).find("ul").slideUp();
+			$(this).find("ul").slideToggle();
+		});
+		$(".topbar ul li ul li, productCategories ul li .megamenu").click(function(e){
+			e.stopPropagation();	
+		});
+		$(".productCategories ul li").click(function(){
+			$(".productCategories ul li").not(this).find(".megamenu").hide();
+			$(this).find(".megamenu").toggle();
+		});
+		$(".otherInfoBody").hide();
+		$(".otherInfoHandle").click(function(){
+			$(".otherInfoBody").slideToggle();
+		});
+		$(".signBtn").click(function(){
+			$("body").css("overflow", "hidden");
+			$(".loginBox").slideDown();
+		});
+		$(".closeBtn").click(function(){
+			$("body").css("overflow", "visible");
+			$(".loginBox").slideUp();
+		});
+		$(".productViewBtn").click(function(e){
+			e.preventDefault();
+			$("body").css("overflow", "hidden");
+			$(".productViewBox").slideDown();
+		});
+		$(".productViewBox-closeBtn").click(function(){
+			$("body").css("overflow", "visible");
+			$(".productViewBox").slideUp();
+		});
+
+		$(".sp-wrap").smoothproducts();
+	});
+</script>
 </body>
 </html>

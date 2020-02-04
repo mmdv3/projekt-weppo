@@ -1,106 +1,91 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html lang="pl">
-<html xmlns="http://www.w3.org/1999/xhtml">
-
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <meta name="keywords" content="" />
-  <meta name="description" content="" />
-
-  <link href="templatemo_style.css" rel="stylesheet" type="text/css" />
-
-  <title>Cart</title>
-
+    <title>Koszyk</title>
+    <link rel="stylesheet" type="text/css" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/owl.carousel.min.css">
 </head>
-
 <body>
-  <!--  Free CSS Templates from www.templatemo.com -->
-  <div id="templatemo_container">
-	<div id="templatemo_menu">
-	  <ul>
-		<li><a href='/'>Main page</a></li>
-		<li> User name: <%= username %> </li>
-		<li><a href="logout">Log out</li>
-      <li>Items in cart: <%= prodAmount %></li>
-    <% if (privileged) { %>
-	<li><a href='users'>List of users</a></li>
-	<li><a href='products'>products</a></li>
-	<li><a href='orders'>orders</a></li>
-    <% } %>
-
-    	</ul>
-    </div> <!-- end of menu -->
-    
-    <div id="templatemo_header">
-    	<div id="templatemo_special_offers">
-        	<p>
-                <span>25%</span> discounts for
-        purchase over $80
-        	</p>
-			<a href="subpage.html" style="margin-left: 50px;">Read more...</a>
-        </div>
-        
-        
-        <div id="templatemo_new_books">
-        	<ul>
-                <li>Suspen disse</li>
-                <li>Maece nas metus</li>
-                <li>In sed risus ac feli</li>
-            </ul>
-            <a href="subpage.html" style="margin-left: 50px;">Read more...</a>
-        </div>
-    </div> <!-- end of header -->
-    
-    <div id="templatemo_content">
-
-        <div id="templatemo_content_cart">
-            <div class="templatemo_content_mid_section">
-                <h1>Items in cart</h1>
+    <div class="topbar">
+        <div class="container">
+             
+            <div class="topcenter">
                 <ul>
-	  <% cart.forEach((p) => { %>
-	  <li>
-		<div class="remove_button">
-		<form method="POST">
-		Nazwa: <%= p.name %>,
-		<!--		opis: <%= p.description %>, -->
-		ilość: <%= p.quantity %>
-		  <input hidden="true" type="number" name="productID" 
-											 value="<%= p.id %>">
-		  	<button formaction="/remove_from_cart">remove</button>
-		</form>
-		</div>
-	  </li>
-	  <% }) %>
+                    <li><a href="/">Strong główna</a></li>
+                    <li><a href="contact">Kontakt</a></li>
+					<% if (privileged) { %>
+						<li><a href='users'>Użytkownicy</a></li>
+						<li><a href='products'>Produkty</a></li>
+						<li><a href='orders'>Zamówienia</a></li>
+					<% } %>
                 </ul>
             </div>
-            <div class="templatemo_content_mid_section">
-			  <form method="POST">
-				<div class="buy_now_button">
-				<button formaction="/make_order">Order now</button>
-				</div>
-			  </form>
+
+            <div class="topright">
+                <ul>
+                    <li><a href="#"><i class="fas fa-phone"></i> (+48)123456789</a></li>
+                    <li>Nazwa użytkownika: <%= username %></li>
+                </ul>
             </div>
-        </div> <!-- end of content left -->
+        </div>
+    </div>
 
+    <div class="header">
+        <a href="/">
+           <div class="container">
+               <div class="logo">
+                   <img src="images/logo.png">
+               </div>
+           </div>
+       </a>
+    </div>
 
+    <div class="product-area">
+		<div class="container">
+			<h3>Produkty w koszyku</h3>
+			<% cart.forEach((v) => { %>
+				<div class="col-3">
+					<a href="#">
+						<img src="<%= v.image %>" alt="" style="width: 1000px;">
+						<div class="caption">
+							<big>Kod: <%= v.code %></big>
+							<h4><%= v.name %></h4>
+							<button class="price"><%= v.price %>zł</button>
+						</div>
+						<form method="POST" action="remove_from_cart">
+							<input hidden="true" type="number" name="productID" value="<%= v.id %>">
+                            <input hidden="true" type="number" name="quantity" value=1>
+                            <input class="submitBtn" 
+									   style="width: 70%;"
+									   type="submit" 
+                                       value="Usuń">
+                        </form>
+					</a>
+				</div>
+            <% }); %>
+		</div>
+    </div>
 
-    	<div class="cleaner_with_height">&nbsp;</div>
-    </div> <!-- end of content -->
-    
-    <div id="templatemo_footer">
-    
-	       <a href="subpage.html">Home</a> | <a href="subpage.html">Search</a> | <a href="subpage.html">Books</a> | <a href="#">New Releases</a> | <a href="#">FAQs</a> | <a href="#">Contact Us</a><br />
-        Copyright © 2024 <a href="#"><strong>Your Company Name</strong></a> 
-        <!-- Credit: www.templatemo.com -->	</div> 
-    <!-- end of footer -->
-<!--  Free CSS Template www.templatemo.com -->
-</div> <!-- end of container -->
-<!-- templatemo 086 book store -->
-<!-- 
-Book Store Template 
-http://www.templatemo.com/preview/templatemo_086_book_store 
--->
+    <% if (prodAmount > 0) { %>
+        <div class="checkout">
+            <div class="container">
+                <div class="orderlist">
+                    <p>Podsumowanie: <span><%= totalPrice %> zł</span></p>
+                    <form method="POST" action="make_order">
+                        <input type="submit" class="applycode-button" value="Złóż zamówienie">
+                    </form>
+                </div>
+            </div>
+        </div>
+    <% } else { %>
+        <div class="centeredText" style="padding-top: 150px; line-height: 3.5em;">
+            <h3>Koszyk jest pusty</h3>
+        </div>
+    <% } %>
+
+<script src="js/jquery-3.3.1.min.js"></script>
+<script src="js/jquery.cycle.js"></script>
+<script src="js/owl.carousel.min.js"></script>
 </body>
 </html>

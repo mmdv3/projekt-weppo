@@ -23,7 +23,7 @@ app.use(express.urlencoded({
 
 app.use((req, res, next) => {
     if (!req.session.username) {
-        req.session.username = 'guest';
+        req.session.username = 'Gość';
     }
     next();
 });
@@ -59,6 +59,7 @@ const repo = new Repository(new pg.Pool({
     user: 'admin'
 }));
 
+// done
 app.get('/', async (req, res) => {
     var items = await repo.getItems();
     var prodAmount = req.session.logged ? req.session.cart.length : 0;
@@ -68,16 +69,21 @@ app.get('/', async (req, res) => {
         items: items, 
         logged: req.session.logged,
 	  	privileged: req.session.privileged,
-        prodAmount: prodAmount
+        prodAmount: prodAmount,
     });
 });
 
+// done
 app.get('/login', (req, res) => {
     res.render('login', {
+        username: req.session.username,
+        logged: req.session.logged, 
+        privileged: req.session.privileged,
         msg: ''
     });
 });
 
+// done
 app.post('/register', async (req, res) => {
     var user = req.body.username.trim();
     var pass = req.body.password;
@@ -90,10 +96,13 @@ app.post('/register', async (req, res) => {
         var msg = await repo.addUser(user, pass);
     
     res.render('login', {
+        username: req.session.username,
         msg: msg,
+        privileged: req.session.privileged
     });
 });
 
+// done
 app.post('/login', async (req, res) => {
     var user = req.body.username.trim();
     var pass = req.body.password;
@@ -117,13 +126,16 @@ app.post('/login', async (req, res) => {
     }
     else {
         res.render('login', {
-            msg: info.msg
+            username: req.session.username,
+            msg: info.msg,
+            privileged: req.session.privileged
         });
     }
 });
 
+// done
 app.get('/logout', isLogged, async (req, res) => {
-    req.session.username = 'gość';
+    req.session.username = 'Gość';
 
     delete req.session.logged;
     delete req.session.cart;
@@ -135,18 +147,13 @@ app.get('/logout', isLogged, async (req, res) => {
         username: req.session.username, 
         items: items, 
         logged: req.session.logged,
-	  	privileged: req.session.privileged
+        privileged: req.session.privileged,
     });
 });
 
+// done
 app.post('/query', async (req, res) => {
-  	if (req.body.query_type == 'name')
-	    var items = await repo.getItemsMatchName(req.body.query_key);
-	else if (req.body.query_type == 'desc')
-	    var items = await repo.getItemsMatchDesc(req.body.query_key);
-	else
-	    var items = await repo.getItems();
-
+    var items = await repo.getItemsMatchName(req.body.search);
     var prodAmount = req.session.logged ? req.session.cart.length : 0;
 
     res.render('index', {
@@ -158,6 +165,7 @@ app.post('/query', async (req, res) => {
     });
 });
 
+// done
 app.post('/add_to_cart', isLogged, async (req, res) => {
     var productID = req.body.productID;
     var quantity = Number(req.body.quantity);
@@ -183,29 +191,39 @@ app.post('/add_to_cart', isLogged, async (req, res) => {
     });
 });
 
+// done
 app.post('/remove_from_cart', isLogged, async (req, res) => {
     req.session.cart = req.session.cart.filter(p => p.id != req.body.productID);
     res.redirect('/cart');
 });
 
+// done
 app.get('/cart', isLogged, async (req, res) => {  
     var cart = await repo.getProducts(req.session.cart); 
+    var totalPrice = cart.reduce((total, prod) => {
+        return total + prod.price;
+    }, 0);
+
     res.render('cart', {
         cart: cart,
 	  	username: req.session.username,
 	  	prodAmount: req.session.cart.length,
-	  	privileged: req.session.privileged,
+        privileged: req.session.privileged,
+        totalPrice: totalPrice
     });
 });
 
+// done
 app.get('/users', isPrivileged, async (req, res) => {
-  	var users = await repo.getUsers();
+    var users = await repo.getUsers();
   	res.render('users', {
 	  	users: users,
-	  	username: req.session.username
+        username: req.session.username,
+        privileged: req.session.privileged
 	});
 });
 
+// done
 app.post('/make_order', isLogged, async (req, res) => {
     var user = await repo.getId(req.session.username);
     var order_id = await repo.newOrder(user);
@@ -216,73 +234,123 @@ app.post('/make_order', isLogged, async (req, res) => {
     res.redirect('finished_order');
 });
 
+// done
 app.get('/finished_order', isLogged, async (req, res) => {
     res.render('finished_order', {
-    	username: req.session.username
+        username: req.session.username,
+        privileged: req.session.privileged
 	});
 });
 
+// done
 app.get('/products', isPrivileged, (req, res) => {
     res.render('products', {
-	  username: req.session.username}
-	);
+      username: req.session.username,
+      privileged: req.session.privileged
+    });
 });
 
-app.get('/edit_products', isPrivileged, async (req, res) => {
+app.post('/edit_products', isPrivileged, async (req, res) => {
     var items = await repo.getItems();
     res.render('edit', {
         items: items,
-	  	username: req.session.username,
+        username: req.session.username,
+        privileged: req.session.privileged,
         msg: ''
     });
 });
 
 app.post('/modify', isPrivileged, async (req, res) => {
-    var newName = req.body.name;
-    var newDesc = req.body.description;
+    var newName = req.body.name;    
+    var newPrice = req.body.price;
+    var newCode = req.body.code;
+    var newImage = req.body.image;
     var id = req.body.id;
 
-    var info = await repo.modifyItem(id, newName, newDesc);
+    var info = await repo.modifyItem(id, newName, newPrice, newCode, newImage);
     var items = await repo.getItems();
 
     res.render('edit', {
         items: items,
         username: req.session.username,
+        privileged: req.session.privileged,
         msg: info.msg
     });
 });
 
 app.post('/remove', isPrivileged, async (req, res) => {
     var id = req.body.id;
-
     var info = await repo.removeItem(id);
     var items = await repo.getItems();
 
     res.render('edit', {
         items: items,
         msg: info.msg,
+        privileged: req.session.privileged,
         username: req.session.username
     })
 });
 
-app.get('/add_products', isPrivileged, (req, res) => {
+app.post('/add_products', isPrivileged, (req, res) => {
     res.render('add', {
         msg: '',
-	  	username: req.session.username
+        username: req.session.username,
+        privileged: req.session.privileged
     });
 });
 
 app.post('/add', isPrivileged, async (req, res) => {
     var name = req.body.name;
-    var desc = req.body.description;
-    
-    var info = await repo.addItem(name, desc);
+    var price = req.body.price;
+    var code = req.body.code;
+    var image = req.body.image;
+    var info = await repo.addItem(name, price, code, image);
 
     res.render('add', {
         msg: info.msg,
-        username: req.session.username
+        username: req.session.username,
+        privileged: req.session.privileged
     });
 });
 
+// done
+app.get('/orders', isPrivileged, async (req, res) => {
+    var orders = await repo.getOrders();
+    
+    res.render('orders', {
+        username: req.session.username,
+        orders: orders,
+        privileged: req.session.privileged
+    });
+});
+
+// done
+app.post('/order_details', isPrivileged, async (req, res) => {
+    var orderID = req.body.orderID;
+    var details = await repo.getOrderDetails(orderID);
+
+    res.render('order_details', {
+        username: req.session.username, 
+        details: details,
+        orderID: orderID,
+        privileged: req.session.privileged
+    });
+});
+
+// done
+app.get('/contact', (req, res) => {
+    res.render('contact', {
+        username: req.session.username,
+        privileged: req.session.privileged
+    });
+});
+
+// done
+app.get('*', (req, res) => {
+    res.render('404', {
+        username: req.session.username,
+        privileged: req.session.privileged
+    });
+})
 
 http.createServer(app).listen(3000);

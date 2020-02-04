@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Edytuj</title>
+    <title>Zamówienia</title>
     <link rel="stylesheet" type="text/css" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <link rel="stylesheet" type="text/css" href="css/owl.carousel.min.css">
@@ -47,60 +47,33 @@
           <thead class="thead-light">
             <tr>
               <th scope="col">#</th>
-              <th scope="col">Nazwa produktu</th>
-              <th scope="col">Cena</th>
-              <th scope="col">Kod produktu</th>
-              <th scope="col">Ścieżka do zdjęcia</th>
+              <th scope="col">Numer zamówienia</th>
+              <th scope="col">Nazwa Użytkownika</th>
+              <th scope="col">Liczba zamówionych produktów</th>
             </tr>
           </thead>
           <tbody>
             <% var id = 1; %>
-            <% items.forEach((v) => { %>
+            <% orders.forEach((o) => { %>
                 <tr>
                     <th scope="row"><%= id %></th>
-                    <form method="POST">
-                        <th>
+                    <th><%= o.orderID %></th>
+                    <th><%= o.username %></th>
+                    <th><%= o.itemCount %></th>
+                    <th>
+                        <form method="POST" action="order_details">
                             <div class="form-inline">
-                                <input type="text" value="<%= v.name %>" name="name"> 
+                                <input type="text"  hidden="true" value="<%= o.orderID %>" name="orderID"> 
+                                <button class="btn btn-primary" style="background-color: orange; border-color:orange;">Szczegóły</button>
                             </div>
-                        </th>
-                        <th>
-                            <div class="form-inline">
-                                <input type="number" value="<%= v.price %>" name="price"> 
-                            </div>
-                        </th>
-                        <th>
-                            <div class="form-inline">
-                                <input type="text" value="<%= v.code %>" name="code"> 
-                            </div>
-                        </th>
-                        <th>
-                            <div class="form-inline">
-                                <input type="text" value="<%= v.image %>" name="image"> 
-                            </div>
-                        </th>
-                        <input type="text" hidden="true" name="id" value="<%= v.id %>">
-                        <th>
-                            <div class="form-inline">
-                                <button class="btn btn-primary" style="background-color: orange; border-color:orange;" formaction="modify">Modyfikuj</button>
-                            </div>
-                            <div class="form-inline">
-                                <button class="btn btn-primary" style="background-color: orange; border-color:orange; margin-top:10px;" formaction="remove">Usuń</button>
-                            </div>
-                        </th>
-                    </form>
+                        </form>
+                    </th>
                 </tr>
                 <% ++id %>
             <% }); %>
           </tbody>
         </table>
     </div>
-
-    <div class="centeredText">
-		<h3>
-			<%= msg %>
-		</h3>
-	</div>
 
 <script src="js/jquery-3.3.1.min.js"></script>
 <script src="js/jquery.cycle.js"></script>
